@@ -7,12 +7,14 @@ from sklearn.model_selection import cross_val_score
 from sklearn.pipeline import Pipeline
 
 from src.data.dataset import Dataset
+import pandas as pd
 
 class Trainer:
-    def __init__(self, models: Dict[str, Any], preprocessor: Any):
+    def __init__(self, models: Dict[str, Any], preprocessor: Any, path_reports: str = None):
         self._models = models
         self._preprocessor = preprocessor
         self._results = {}
+        self._path_reports = path_reports
 
     def train(self, dataset: Dataset):
         for name, classifier in self._models.items():
@@ -71,6 +73,9 @@ class Trainer:
 
         ax.set(title='Matrix de Confusão para {}'.format(name))
         disp.plot(ax=ax)
+        if self._path_reports:
+            disp.figure_.savefig(f"{self._path_reports}/confusion_matrix_{name}.png")
+        return plt
         
 
     def plot_roc_auc(self):
@@ -90,7 +95,10 @@ class Trainer:
         plt.ylabel('Taxa de TP')
         plt.title('Curva ROC')
         plt.legend(loc='lower right')
+        if self._path_reports:
+            plt.savefig(f"{self._path_reports}/curve_roc.png")
         plt.show()
+        return plt
 
 
     def plot_results(self):
@@ -98,8 +106,6 @@ class Trainer:
         for name, _ in self._results.items():
             self.plot_result_model(name)
 
-        
-        
         
         
     
